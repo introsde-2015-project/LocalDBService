@@ -16,7 +16,8 @@ import javax.xml.bind.annotation.XmlType;
 	    "firstname",
 	    "lastname",
 	    "birthdate",
-	    "healthProfile"
+	    "healthProfile",
+	    "goals"
 	})
 @Entity  // indicates that this class is an entity to persist in DB
 @Cacheable(false)
@@ -46,11 +47,15 @@ public class Person implements Serializable {
     
     // Join person to measures with OneToMany link
     @OneToMany(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
-    private List<Measure> measure;
+    private List<Measure> measures;
     
     // Join person to healthProfile with OneToOne link
     @OneToOne(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     private HealthProfile healthProfile;
+    
+ // Join person to goals with OneToMany link
+    @OneToMany(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+    private List<Goal> goals;
     
     // Getters
     public int getIdPerson(){
@@ -68,12 +73,16 @@ public class Person implements Serializable {
     }
     
     @XmlTransient
-    public List<Measure> getMeasure() {
-        return measure;
+    public List<Measure> getMeasures() {
+        return measures;
     }
     
     public HealthProfile getHealthProfile() {
     	return healthProfile;
+    }
+    
+    public List<Goal> getGoals() {
+        return goals;
     }
     
     // Setters
@@ -94,8 +103,12 @@ public class Person implements Serializable {
     	this.healthProfile = healthProfile;
     }
     
-    public void setMeasure(List<Measure> measure) {
-        this.measure = measure;
+    public void setMeasures(List<Measure> measures) {
+        this.measures = measures;
+    }
+    
+    public void setGoals(List<Goal> goals) {
+        this.goals = goals;
     }
     
     // Database operations
@@ -125,7 +138,7 @@ public class Person implements Serializable {
     		List<Measure> measures = p.getHealthProfile().getMeasures();
     		for (Measure measure: measures) {
     			// Check that measuretype equals to the one in queryParam
-    			if (measure.getMeasure().equals(measureType)) {
+    			if (measure.getMeasureType().getMeasureName().equals(measureType)) {
     				// Check that measure value is larger than min in queryParam
     				if (min == 0 || measure.getValue() >= min) {
     					// Check that measure value is smaller than max in queryParam

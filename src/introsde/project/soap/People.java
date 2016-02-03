@@ -1,4 +1,6 @@
 package introsde.project.soap;
+import introsde.project.model.Goal;
+import introsde.project.model.GoalType;
 import introsde.project.model.Measure;
 import introsde.project.model.MeasureType;
 import introsde.project.model.Person;
@@ -22,54 +24,64 @@ import javax.jws.soap.SOAPBinding.Use;
 @SOAPBinding(style = Style.DOCUMENT, use=Use.LITERAL)
 public interface People {
 
-	// Method 1
     @WebMethod(operationName="readPersonList")
     @WebResult(name="people") 
     public List<Person> readPersonList();
 
-    // Method 2
     @WebMethod(operationName="readPerson")
     @WebResult(name="person") 
     public Person readPerson(@WebParam(name="personId") int id);
 
-    // Method 3
     @WebMethod(operationName="updatePerson")
     @WebResult(name="personId") 
     public int updatePerson(@WebParam(name="person") Person person);
 
-    // Method 4
     @WebMethod(operationName="createPerson")
     @WebResult(name="newPerson") 
     public Person createPerson(@WebParam(name="person") Person person);
 
-    // Method 5
     @WebMethod(operationName="deletePerson")
     @WebResult(name="deletedValue") 
     public boolean deletePerson(@WebParam(name="personId") int id);
     
-    // Method 6
-    @WebMethod(operationName="readPersonHistory")
+    @WebMethod(operationName="readPersonMeasureHistory")
     @WebResult(name="measurehistory") 
-    public List<Measure> readPersonHistory(@WebParam(name="personId") int id, @WebParam(name="measureType") String measureType);
+    public List<Measure> readPersonMeasureHistory(@WebParam(name="personId") int id, @WebParam(name="measureType") String measureType);
     
-    // Method 7
     @WebMethod(operationName="readMeasureTypes")
     @WebResult(name="measuretypes") 
     public List<MeasureType> readMeasureTypes();
     
-    // Method 8
     @WebMethod(operationName="readPersonMeasure")
     @WebResult(name="measure") 
     public Measure readPersonMeasure(@WebParam(name="personId") int id, @WebParam(name="measureType") String measureType, @WebParam(name="measureId") int mid);
     
-    // Method 9
-    @WebMethod(operationName="savePersonMeasure")
+    @WebMethod(operationName="createPersonMeasure")
     @WebResult(name="newMeasure") 
-    public Measure savePersonMeasure(@WebParam(name="personId") int id, @WebParam(name="measure") Measure measure);
+    public Measure createPersonMeasure(@WebParam(name="personId") int id, @WebParam(name="measure") Measure measure);
     
-    // Method 10
     @WebMethod(operationName="updatePersonMeasure")
     @WebResult(name="measureId") 
     public int updatePersonMeasure(@WebParam(name="personId") int id, @WebParam(name="measure") Measure measure);
-
+    
+    @WebMethod(operationName="readPersonGoals")
+    @WebResult(name="personGoals") 
+    public List<Goal> readPersonGoals(@WebParam(name="personId") int id);
+    
+    @WebMethod(operationName="readPersonGoalsByMeasure")
+    @WebResult(name="personMeasureGoals") 
+    public List<Goal> readPersonGoalsByMeasure(@WebParam(name="personId") int id, @WebParam(name="measureType") String measureType);
+    
+    @WebMethod(operationName="createPersonGoal")
+    @WebResult(name="newGoal") 
+    public Goal createPersonGoal(@WebParam(name="personId") int id, @WebParam(name="goal") Goal goal);
+    
+    @WebMethod(operationName="updatePersonGoal")
+    @WebResult(name="goalId") 
+    public int updatePersonGoal(@WebParam(name="personId") int id, @WebParam(name="goal") Goal goal);
+    
+    @WebMethod(operationName="readGoalTypes")
+    @WebResult(name="goaltypes") 
+    public List<GoalType> readGoalTypes();
+    
 }

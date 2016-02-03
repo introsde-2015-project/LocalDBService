@@ -18,9 +18,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
@@ -31,14 +33,16 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "Measure", propOrder = {
 	    "mid",
 	    "created",
-	    "measure",
-	    "value",
-	    "valueType"
+	    "measureType",
+	    "value"
 	})
 @Entity
 @Cacheable(false)
 @Table(name = "Measure")
-@NamedQuery(name = "Measure.findAll", query = "SELECT m FROM Measure m")
+@NamedQueries({
+	@NamedQuery(name = "Measure.findAll", query = "SELECT m FROM Measure m"),
+	@NamedQuery(name="Measure.findAllByIdAndMeasureType", query="SELECT m FROM Measure m, MeasureType mt WHERE m.person.idPerson = :idPerson AND m.measureType.idMeasureType = mt.idMeasureType AND mt.measureName = :measureType")
+})
 
 /**
  * Class for handling Measure database table
@@ -63,12 +67,6 @@ public class Measure implements Serializable {
 	@Column(name = "created")
 	private String created;
 	
-	@Column(name="measure")
-	private String measure;
-	
-	@Column(name="valueType")
-	private String valueType;
-	
 	// Join measure to person with ManyToOne link
 	@ManyToOne
 	@JoinColumn(name="idPerson",referencedColumnName="idPerson")
@@ -78,14 +76,20 @@ public class Measure implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="idHealthProfile",referencedColumnName="idHealthProfile")
 	private HealthProfile healthProfile;
+	
+	// Join measure to measureType with ManyToOne link
+	@ManyToOne
+	@JoinColumn(name="idMeasureType",referencedColumnName="idMeasureType")
+	private MeasureType measureType;
 
 	// Getters
 	public int getMid() {
 		return mid;
 	}
 	
-	public String getMeasure() {
-		return measure;
+	@XmlElement(name="measureName")
+	public MeasureType getMeasureType() {
+		return measureType;
 	}
 	
 	public double getValue() {
@@ -106,18 +110,17 @@ public class Measure implements Serializable {
 		return healthProfile;
 	}
 	
-	public String getValueType() {
-		return this.valueType;
-	}
-	
 	// Setters
 	
 	public void setMid(int mid) {
 		this.mid = mid;
 	}
 	
-	public void setMeasure(String measure) {
-		this.measure = measure;
+	public void setMeasureType(MeasureType measureType) {
+		if (measureType.getIdMeasureType() == 0 ) {
+		    measureType = MeasureType.getByName(measureType.getMeasureName());
+		    this.measureType = measureType;	
+		}
 	}
 
 	public void setValue(double value) {
@@ -134,10 +137,6 @@ public class Measure implements Serializable {
 
 	public void setHealthProfile(HealthProfile healthProfile) {
 		this.healthProfile = healthProfile;
-	}
-	
-	public void setValueType(String valueType) {
-		this.valueType = valueType;
 	}
 	
 	// Database operations
@@ -158,27 +157,28 @@ public class Measure implements Serializable {
 	public static List<Measure> getMeasureHistory(int id, String measureType, String beforeDate, String afterDate) {
         
 		EntityManager em = LifeCoachDao.instance.createEntityManager();
-	    List<Measure> measureList = em.createNamedQuery("Measure.findAll", Measure.class).getResultList();
+	    @SuppressWarnings("unchecked")
+		List<Measure> measureList = em.createNamedQuery("Measure.findAllByIdAndMeasureType")
+    	        .setParameter("idPerson", id)
+    	        .setParameter("measureType", measureType)
+    	        .getResultList();
 	    List<Measure> measureHistory = new ArrayList<Measure>();
 	    LifeCoachDao.instance.closeConnections(em);
 	    
 	    DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); 
 	    
 	    for (Measure measure: measureList) {
-	    	// Check that measure has same type and id than in the uri request
-	    	if (measure.getMeasure().equals(measureType) && measure.getPerson().getIdPerson() == id) {
-	    			// If queryParams presented, check that measure date fits the query params
-					try {
-						if (beforeDate == null || (beforeDate != null && df.parse(measure.getCreated()).before(df.parse(beforeDate)))) {
-							if (afterDate == null || (afterDate != null && df.parse(measure.getCreated()).after(df.parse(afterDate)))) {
-								// If measure passes checks, add to list
-								measureHistory.add(measure);
-							}
-						}
-					} catch (ParseException e) {
-						e.printStackTrace();
+			// If queryParams presented, check that measure date fits the query params
+			try {
+				if (beforeDate == null || (beforeDate != null && df.parse(measure.getCreated()).before(df.parse(beforeDate)))) {
+					if (afterDate == null || (afterDate != null && df.parse(measure.getCreated()).after(df.parse(afterDate)))) {
+						// If measure passes checks, add to list
+						measureHistory.add(measure);
 					}
-	    	}
+				}
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
 	    }
 	    return measureHistory;
 	}

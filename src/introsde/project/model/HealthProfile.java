@@ -65,7 +65,7 @@ public class HealthProfile implements Serializable {
     			// Loop through current measures
     		   for (int k = 0; k < currentMeasures.size(); k++) {
     			  // If same measureType already exist in current measures
-    		      if(measures.get(i).getMeasure().equals(currentMeasures.get(k).getMeasure())) {
+    		      if(measures.get(i).getMeasureType().getIdMeasureType() == currentMeasures.get(k).getMeasureType().getIdMeasureType()) {
     		    	  try {
     		    		//  Compare creation dates and
 						if (df.parse(measures.get(i).getCreated()).after(df.parse(currentMeasures.get(k).getCreated()))) {
