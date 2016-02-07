@@ -68,7 +68,7 @@ public class HealthProfile implements Serializable {
     		      if(measures.get(i).getMeasureType().getIdMeasureType() == currentMeasures.get(k).getMeasureType().getIdMeasureType()) {
     		    	  try {
     		    		//  Compare creation dates and
-						if (df.parse(measures.get(i).getCreated()).after(df.parse(currentMeasures.get(k).getCreated()))) {
+						if (df.parse(measures.get(i).getDate()).after(df.parse(currentMeasures.get(k).getDate()))) {
 							// If measure is newer than current one, remove the current one  
 							currentMeasures.remove(k);
 						  } else {

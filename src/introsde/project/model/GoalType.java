@@ -90,8 +90,6 @@ public class GoalType implements Serializable {
 		}
 	}
 	
-	
-	
 	public static GoalType getByName(String goalName) {
 	    EntityManager em = LifeCoachDao.instance.createEntityManager();
 	    GoalType goalType = em.createNamedQuery("GoalType.findByName", GoalType.class)

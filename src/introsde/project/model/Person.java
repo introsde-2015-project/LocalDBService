@@ -17,7 +17,8 @@ import javax.xml.bind.annotation.XmlType;
 	    "lastname",
 	    "birthdate",
 	    "healthProfile",
-	    "goals"
+	    "goals",
+	    "imageUrl"
 	})
 @Entity  // indicates that this class is an entity to persist in DB
 @Cacheable(false)
@@ -44,6 +45,8 @@ public class Person implements Serializable {
     private String firstname;
     @Column(name="birthdate")
     private String birthdate; 
+    @Column(name="imageUrl")
+    private String imageUrl; 
     
     // Join person to measures with OneToMany link
     @OneToMany(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
@@ -53,7 +56,7 @@ public class Person implements Serializable {
     @OneToOne(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     private HealthProfile healthProfile;
     
- // Join person to goals with OneToMany link
+    // Join person to goals with OneToMany link
     @OneToMany(mappedBy="person",cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     private List<Goal> goals;
     
@@ -70,6 +73,9 @@ public class Person implements Serializable {
     }
     public String getBirthdate(){
         return birthdate;
+    }
+    public String getImageUrl(){
+        return imageUrl;
     }
     
     @XmlTransient
@@ -97,6 +103,9 @@ public class Person implements Serializable {
     }
     public void setBirthdate(String birthdate){
         this.birthdate = birthdate;
+    }
+    public void setImageUrl(String imageUrl){
+        this.imageUrl = imageUrl;
     }
     
     public void setHealthProfile(HealthProfile healthProfile) {
@@ -162,7 +171,7 @@ public class Person implements Serializable {
 	    	for (Measure measure: hp.getAllMeasures()) {
 	    		measure.setPerson(p);
 	    		measure.setHealthProfile(hp);
-	    		measure.setCreated(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+	    		measure.setDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 	    	}
     	}
         EntityManager em = LifeCoachDao.instance.createEntityManager();

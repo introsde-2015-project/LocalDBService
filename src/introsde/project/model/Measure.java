@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "Measure", propOrder = {
 	    "mid",
-	    "created",
+	    "date",
 	    "measureType",
 	    "value"
 	})
@@ -64,8 +64,8 @@ public class Measure implements Serializable {
 	@Column(name = "value")
 	private double value;
 	
-	@Column(name = "created")
-	private String created;
+	@Column(name = "date")
+	private String date;
 	
 	// Join measure to person with ManyToOne link
 	@ManyToOne
@@ -96,8 +96,8 @@ public class Measure implements Serializable {
 		return value;
 	}
 	
-	public String getCreated() {
-		return created;
+	public String getDate() {
+		return date;
 	}
 	
 	@XmlTransient
@@ -119,16 +119,16 @@ public class Measure implements Serializable {
 	public void setMeasureType(MeasureType measureType) {
 		if (measureType.getIdMeasureType() == 0 ) {
 		    measureType = MeasureType.getByName(measureType.getMeasureName());
-		    this.measureType = measureType;	
 		}
+		this.measureType = measureType;	
 	}
 
 	public void setValue(double value) {
 		this.value = value;
 	}
 	
-	public void setCreated(String created) {
-		this.created = created;
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 	public void setPerson(Person person) {
@@ -170,8 +170,8 @@ public class Measure implements Serializable {
 	    for (Measure measure: measureList) {
 			// If queryParams presented, check that measure date fits the query params
 			try {
-				if (beforeDate == null || (beforeDate != null && df.parse(measure.getCreated()).before(df.parse(beforeDate)))) {
-					if (afterDate == null || (afterDate != null && df.parse(measure.getCreated()).after(df.parse(afterDate)))) {
+				if (beforeDate == null || (beforeDate != null && df.parse(measure.getDate()).before(df.parse(beforeDate)))) {
+					if (afterDate == null || (afterDate != null && df.parse(measure.getDate()).after(df.parse(afterDate)))) {
 						// If measure passes checks, add to list
 						measureHistory.add(measure);
 					}

@@ -35,8 +35,7 @@ import javax.xml.bind.annotation.XmlType;
 	    "measureType",
 	    "goalType",
 	    "value",
-	    "created",
-	    "end"
+	    "date"
 	})
 @Entity
 @Cacheable(false)
@@ -67,11 +66,8 @@ public class Goal implements Serializable {
 	@Column(name = "value")
 	private double value;
 	
-	@Column(name = "created")
-	private String created;
-	
-	@Column(name = "end")
-	private String end;
+	@Column(name = "date")
+	private String date;
 	
 	// Join goal to person with ManyToOne link
 	@ManyToOne
@@ -102,12 +98,8 @@ public class Goal implements Serializable {
 		return value;
 	}
 	
-	public String getCreated() {
-		return created;
-	}
-	
-	public String getEnd() {
-		return end;
+	public String getDate() {
+		return date;
 	}
 	
 	@XmlTransient
@@ -129,27 +121,23 @@ public class Goal implements Serializable {
 	public void setMeasureType(MeasureType measureType) {
 		if (measureType.getIdMeasureType() == 0 ) {
 		    measureType = MeasureType.getByName(measureType.getMeasureName());
-		    this.measureType = measureType;	
 		}
+		this.measureType = measureType;	
 	}
 	
 	public void setGoalType(GoalType goalType) {
 		if (goalType.getIdGoalType() == 0 ) {
-		    goalType = GoalType.getByName(goalType.getGoalName());
-		    this.goalType = goalType;	
+		    goalType = GoalType.getByName(goalType.getGoalName());	
 		}
+		this.goalType = goalType;
 	}
 	
 	public void setValue(double value) {
 		this.value = value;
 	}
 	
-	public void setCreated(String created) {
-		this.created = created;
-	}
-	
-	public void setEnd(String end) {
-		this.end = end;
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 	public void setPerson(Person person) {
