@@ -38,9 +38,10 @@ public class PeopleImpl implements People {
     }
 
     @Override
-    public Person updatePerson(Person person) {
+    public Person updatePerson(Person person, int personId) {
     	// Updating only person information
-    	Person existing = Person.getPersonById(person.getIdPerson());
+    	Person existing = Person.getPersonById(personId);
+    	person.setIdPerson(existing.getIdPerson());
         if (person.getFirstname() == null) {
         	person.setFirstname(existing.getFirstname());
         }
@@ -49,6 +50,9 @@ public class PeopleImpl implements People {
         }
         if (person.getBirthdate() == null) {
         	person.setBirthdate(existing.getBirthdate());
+        }
+        if (person.getImageUrl() == null) {
+        	person.setImageUrl(existing.getImageUrl());
         }
         Person updPerson = Person.updatePerson(person);
         return updPerson;
@@ -89,8 +93,10 @@ public class PeopleImpl implements People {
     }
 
     @Override
-    public Measure createPersonMeasure(int id, Measure measure) {
-        Person person = Person.getPersonById(id);
+    public Measure createPersonMeasure(int personId, Measure measure, String measureType) {
+        Person person = Person.getPersonById(personId);
+        MeasureType mt = MeasureType.getByName(measureType);
+        measure.setMeasureType(mt);
         // Set person and healthProfile for measure
         measure.setPerson(person);
         measure.setHealthProfile(person.getHealthProfile());
@@ -101,19 +107,14 @@ public class PeopleImpl implements People {
         return Measure.saveMeasure(measure);
     }
 
-    @Override
-    public Measure updatePersonMeasure(int personId, Measure measure) {
-        Person person = Person.getPersonById(personId);
-        // Set person and healthProfile for measure
-        measure.setPerson(person);
-        measure.setHealthProfile(person.getHealthProfile());
-        Measure updMeasure = Measure.updateMeasure(measure);
-        return updMeasure;
-    }
-
 	@Override
-	public List<Goal> readPersonGoals(int id) {
-		return Goal.getAllByPersonId(id);
+	public List<Goal> readPersonGoals(int personId) {
+		return Goal.getAllByPersonId(personId);
+	}
+	
+	@Override
+	public List<Goal> readPersonGoalsByMeasure(int personId, String measureType) {
+		return Goal.getAllByIdAndType(personId, measureType);
 	}
 
 	@Override
@@ -130,9 +131,10 @@ public class PeopleImpl implements People {
 	}
 
 	@Override
-	public Goal updatePersonGoal(int personId, Goal goal) {
+	public Goal updatePersonGoal(int personId, Goal goal, int goalId) {
 		Person person = Person.getPersonById(personId);
-		Goal existing = Goal.getGoalById(goal.getGid());
+		Goal existing = Goal.getGoalById(goalId);
+		goal.setGid(goalId);
         // Set person and healthProfile for measure
         goal.setPerson(person);
         goal.setDate(existing.getDate());
@@ -156,11 +158,6 @@ public class PeopleImpl implements People {
 	}
 
 	@Override
-	public List<Goal> readPersonGoalsByMeasure(int id, String measureType) {
-		return Goal.getAllByIdAndType(id, measureType);
-	}
-
-	@Override
 	public List<Timeline> readPersonTimelines(int id) {
 		return Timeline.getAllByPersonId(id);
 	}
@@ -178,25 +175,29 @@ public class PeopleImpl implements People {
 	}
 
 	@Override
-	public boolean removeTimeline(int id) {
-        Timeline tl = Timeline.getTimelineById(id);
+	public boolean removeTimeline(int personId, int timelineId) {
+        Timeline tl = Timeline.getTimelineById(timelineId);
         if (tl!=null) {
-            Timeline.removeTimeline(tl);
-            return true;
+        	if (tl.getPerson().getIdPerson() == personId) {
+        		Timeline.removeTimeline(tl);
+                return true;
+            }
+            return false;
         } else {
             return false;
         }
 	}
 
-	@Override
-	public boolean removeMeasure(int id) {
-        Measure m = Measure.getMeasureById(id);
+	public boolean removeMeasure(int personId, int measureId) {
+        Measure m = Measure.getMeasureById(measureId);
         if (m!=null) {
-            Measure.removeMeasure(m);
-            return true;
-        } else {
+        	if (m.getPerson().getIdPerson() == personId) {
+        		Measure.removeMeasure(m);
+                return true;
+            }
             return false;
         }
+        return false;
 	}
 
 	@Override
